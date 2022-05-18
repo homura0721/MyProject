@@ -76,7 +76,8 @@ public class IndexController {
             response.setHeader("Cache-Control", "no-cache");
             response.setDateHeader("Expire", 0);
             VerifyUtil randomValidateCode = new VerifyUtil();
-            randomValidateCode.getVerifyImage(request, response);//输出验证码图片方法
+            String code = randomValidateCode.getVerifyImage(response);//输出验证码图片方法
+            redisUtils.set(CommonUtils.getCaptchaKey(request), code, 60, TimeUnit.SECONDS);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -84,15 +85,17 @@ public class IndexController {
 
     @PostMapping("/checkVerify")
     @ResponseBody
-    public boolean checkVerify(@RequestBody Map<String, Object> requestMap, HttpSession session) {
+    public boolean checkVerify(@RequestBody Map<String, Object> requestMap, HttpSession session, HttpServletRequest request) {
         try{
             //从session中获取随机数
             String inputStr = requestMap.get("inputStr").toString();
-            String random = (String) session.getAttribute("RANDOMVALIDATECODEKEY");
+//            String random = (String) session.getAttribute("RANDOMVALIDATECODEKEY");
+            String random = (String) redisUtils.get(CommonUtils.getCaptchaKey(request));
             if (random == null) {
                 return false;
             }
             if (random.equalsIgnoreCase(inputStr)) {
+                redisUtils.del(CommonUtils.getCaptchaKey(request));
                 return true;
             } else {
                 return false;
