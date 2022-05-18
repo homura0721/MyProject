@@ -33,7 +33,7 @@ public class TokenInterceptor implements HandlerInterceptor {
             falseResult(response, RequestCode.UNAUTHORIZED.getCode(), "token验证失败");
             return false;
         }
-        redisUtils.set(token, TokenUtil.getId(token), 1, TimeUnit.DAYS);
+        redisUtils.set("token:" + token, TokenUtil.getId(token), 1, TimeUnit.DAYS);
         return true;
     }
 

@@ -28,13 +28,13 @@ public class UserServiceImp extends ServiceImpl<UserDao, User> implements UserSe
      * @return
      */
     public int login(User user) {
-        User u = (User) redisUtils.get(user.getUsername());
+        User u = (User) redisUtils.get("user:" + user.getUsername());
         if (u != null && user.getPassword().equals(u.getPassword())) {
             return u.getId();
         }
         u = this.getOne(Wrappers.<User>lambdaQuery().eq(User::getUsername, user.getUsername()).eq(User::getPassword, user.getPassword()), false);
         if (u != null) {
-            redisUtils.set(u.getUsername(), u, 3, TimeUnit.DAYS);
+            redisUtils.set("user:" + u.getUsername(), u, 3, TimeUnit.DAYS);
             return u.getId();
         } else {
             return -1;
@@ -42,6 +42,7 @@ public class UserServiceImp extends ServiceImpl<UserDao, User> implements UserSe
     }
 
     /**
+     * 先去redis里查
      * 返回-1表示用户已存在
      * 返回200表示注册成功
      *
@@ -49,9 +50,14 @@ public class UserServiceImp extends ServiceImpl<UserDao, User> implements UserSe
      * @return
      */
     public int register(User user) {
-        User u = this.getOne(Wrappers.<User>lambdaQuery().eq(User::getUsername, user.getUsername()), false);
+        User u = (User) redisUtils.get("user:" + user.getUsername());
+        if (u != null) {
+            return -1;
+        }
+        u = this.getOne(Wrappers.<User>lambdaQuery().eq(User::getUsername, user.getUsername()), false);
         if (u == null) {
             this.save(user);
+            redisUtils.set("user:" + user.getUsername(), user, 3, TimeUnit.DAYS);
             return 200;
         } else {
             return -1;

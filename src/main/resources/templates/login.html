@@ -88,9 +88,9 @@
                         <div class="form-group">
                             <div class="fxt-checkbox-area">
                                 <div class="checkbox">
-                                    <input id="checkbox1" type="checkbox">
+                                    <input id="rememberMe" type="checkbox">
                                     <!--                                    <label for="checkbox1">Keep me logged in</label>-->
-                                    <label for="checkbox1">Remember me</label>
+                                    <label for="rememberMe">Remember me</label>
                                 </div>
                                 <a href="forgot-password" class="switcher-text">Forgot Password</a>
                             </div>
@@ -157,6 +157,11 @@
         getVerify();
         $("#username").val(localStorage.getItem("username"));
         $("#password").val(localStorage.getItem("password"));
+        console.log(localStorage.getItem("rememberMe"));
+        //todo false没法
+        $("#rememberMe").prop("checked", localStorage.getItem("rememberMe"));
+
+
     }
 
     function btnLogin() {
@@ -164,11 +169,11 @@
         var password = $("#password").val();
         var verifyCode = $("#VerifyCode").val();
 
-        if (username == ""){
+        if (username == "") {
             toastr.warning("请输入用户名！");
             return false;
         }
-        if (password == ""){
+        if (password == "") {
             toastr.warning("请输入密码！");
             return false;
         }
@@ -176,16 +181,16 @@
             toastr.warning("请输入验证码！");
             return false;
         }
-        checkVerify();
+        checkVerify(username, password, verifyCode);
     }
 
     function getVerify() {
         document.getElementById("imgVerify").src = "http://localhost:8080" + "/getVerify/" + Math.random();
     }
 
-    function checkVerify() {
+    function checkVerify(u, p, v) {
         var d = {
-            inputStr: $("#VerifyCode").val()
+            inputStr: v
         }
         var data = JSON.stringify(d);
         // console.log(data)
@@ -197,7 +202,7 @@
             data: data,
             success: function (result) {
                 if (result) {
-                    login();
+                    login(u, p);
                 } else {
                     getVerify();
                     toastr.error("验证码错误！")
@@ -209,10 +214,7 @@
         });
     }
 
-    function login() {
-        var u = $("#username").val();
-        var p = $("#password").val();
-
+    function login(u, p) {
         var param = {
             username: encrypt_str(u),
             password: encrypt_str(p)
@@ -231,20 +233,22 @@
                 if (result.code == 200) {
                     localStorage.setItem("token", result.data);
                     toastr.success(localStorage.getItem("token"))
-                    if ($("#checkbox1").get(0).checked) {
-                        localStorage.setItem("username", u)
-                        localStorage.setItem("password", p)
+                    if ($("#rememberMe").prop("checked")) {
+                        localStorage.setItem("username", u);
+                        localStorage.setItem("password", p);
+                        localStorage.setItem("rememberMe", "true");
                     } else {
-                        localStorage.setItem("username", "")
-                        localStorage.setItem("password", "")
+                        localStorage.setItem("username", "");
+                        localStorage.setItem("password", "");
+                        localStorage.setItem("rememberMe", "false");
                     }
                 } else {
-                    toastr.error(result.message)
+                    toastr.error(result.message);
                     getVerify();
                 }
             },
             error: function (result) {
-                toastr.error(result)
+                toastr.error(result);
             }
         });
     }

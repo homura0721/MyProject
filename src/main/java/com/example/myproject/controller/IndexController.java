@@ -24,16 +24,15 @@ public class IndexController {
     @PostMapping("/doLogin")
     @ResponseBody
     public Result<String> doLogin(@RequestBody User user) throws Exception {
-
         user.setUsername(AESUtil.Decrypt(user.getUsername()));
         user.setPassword(AESUtil.Decrypt(user.getPassword()));
 
         int id = userServiceImp.login(user);
         if (id == -1) {
-            return Result.fail(RequestCode.FAIL.getCode(),"登录失败！");
+            return Result.fail(RequestCode.FAIL.getCode(), "登录失败！");
         }
         String token = TokenUtil.sign(id + "");
-        redisUtils.set(token, id ,1 , TimeUnit.DAYS);
+        redisUtils.set("token:" + token, id, 1, TimeUnit.DAYS);
         return Result.success(token);
     }
 
@@ -59,7 +58,7 @@ public class IndexController {
             String token = request.getHeader("Authorization");
             redisUtils.del(token);
             return Result.success("退出登录");
-        } catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             return Result.fail(RequestCode.FAIL.getCode(), "失败");
         }
@@ -69,7 +68,7 @@ public class IndexController {
      * 生成验证码
      */
     @GetMapping("/getVerify/{random}")
-    public void getVerify(@PathVariable String random,  HttpServletRequest request,HttpServletResponse response) {
+    public void getVerify(@PathVariable String random, HttpServletRequest request, HttpServletResponse response) {
         try {
             response.setContentType("image/jpeg");//设置相应类型,告诉浏览器输出的内容为图片
             response.setHeader("Pragma", "No-cache");//设置响应头信息，告诉浏览器不要缓存此内容
@@ -85,8 +84,8 @@ public class IndexController {
 
     @PostMapping("/checkVerify")
     @ResponseBody
-    public boolean checkVerify(@RequestBody Map<String, Object> requestMap, HttpSession session, HttpServletRequest request) {
-        try{
+    public boolean checkVerify(@RequestBody Map<String, Object> requestMap, HttpServletRequest request) {
+        try {
             //从session中获取随机数
             String inputStr = requestMap.get("inputStr").toString();
 //            String random = (String) session.getAttribute("RANDOMVALIDATECODEKEY");
@@ -100,7 +99,7 @@ public class IndexController {
             } else {
                 return false;
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             System.out.println("验证码校验失败" + e);
             return false;
         }
@@ -111,7 +110,7 @@ public class IndexController {
     public String test(HttpServletRequest request) throws Exception {
         // {"username":"TNxJKgCmFKVQmyTCOaJCIw==","password":"sIaKap9w2qe0xO8jNC2MXQ=="}
 
-        String a =  AESUtil.Decrypt("TNxJKgCmFKVQmyTCOaJCIw==");
+        String a = AESUtil.Decrypt("TNxJKgCmFKVQmyTCOaJCIw==");
         String b = AESUtil.Decrypt("sIaKap9w20xOqe8jNC2MXQ==");
 
         System.out.println(a);

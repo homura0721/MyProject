@@ -68,7 +68,7 @@ public class TokenUtil {
 
 
     public static int getIdFromRedis(RedisUtils redisUtils, String token) {
-        return (int) redisUtils.get(token);
+        return (int) redisUtils.get("token:" + token);
     }
 
 }

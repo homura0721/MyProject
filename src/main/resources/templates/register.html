@@ -175,7 +175,7 @@
                 }
             },
             error: function (result) {
-                console.log(result)
+                toastr.error(result.message);
             }
         });
     }
