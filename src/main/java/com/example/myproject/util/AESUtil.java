@@ -8,19 +8,11 @@ import javax.crypto.spec.SecretKeySpec;
 
 public class AESUtil {
 
-    private static final String SECRET = "hahahahahahahaha";
+    private static final String SECRET = "qwertyuiop123456";
 
     // 加密
-    public static String Encrypt(String sSrc, String sKey) throws Exception {
-        if (sKey == null) {
-            sKey = SECRET;
-        }
-        // 判断Key是否为16位
-        if (sKey.length() != 16) {
-            System.out.print("Key长度不是16位");
-            return null;
-        }
-        byte[] raw = sKey.getBytes("utf-8");
+    public static String Encrypt(String sSrc) throws Exception {
+        byte[] raw = SECRET.getBytes("utf-8");
         SecretKeySpec skeySpec = new SecretKeySpec(raw, "AES");
         Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");//"算法/模式/补码方式"
         cipher.init(Cipher.ENCRYPT_MODE, skeySpec);
@@ -30,19 +22,9 @@ public class AESUtil {
     }
 
     // 解密
-    public static String Decrypt(String sSrc, String sKey) throws Exception {
+    public static String Decrypt(String sSrc) throws Exception {
         try {
-            // 判断Key是否正确
-            if (sKey == null) {
-                System.out.print("Key为空null");
-                return null;
-            }
-            // 判断Key是否为16位
-            if (sKey.length() != 16) {
-                System.out.print("Key长度不是16位");
-                return null;
-            }
-            byte[] raw = sKey.getBytes("utf-8");
+            byte[] raw = SECRET.getBytes("utf-8");
             SecretKeySpec skeySpec = new SecretKeySpec(raw, "AES");
             Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
             cipher.init(Cipher.DECRYPT_MODE, skeySpec);
@@ -59,23 +41,6 @@ public class AESUtil {
             System.out.println(ex.toString());
             return null;
         }
-    }
-
-    public static void main(String[] args) throws Exception {
-        /*
-         * 此处使用AES-128-ECB加密模式，key需要为16位。
-         */
-        String cKey = "1234567890123456";
-        // 需要加密的字串
-        String cSrc = "www.gowhere.so";
-        System.out.println(cSrc);
-        // 加密
-        String enString = AESUtil.Encrypt(cSrc, cKey);
-        System.out.println("加密后的字串是：" + enString);
-
-        // 解密
-        String DeString = AESUtil.Decrypt(enString, cKey);
-        System.out.println("解密后的字串是：" + DeString);
     }
 
 }

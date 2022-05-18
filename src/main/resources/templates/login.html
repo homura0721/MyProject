@@ -131,6 +131,10 @@
 
 <script src="static/js/toastr.min.js"></script>
 
+<script src="static/js/aes.js"></script>
+
+<script src="static/js/crypto-js.js"></script>
+
 
 <script>
     toastr.options = {
@@ -210,8 +214,8 @@
         var p = $("#password").val();
 
         var param = {
-            username: u,
-            password: p
+            username: encrypt_str(u),
+            password: encrypt_str(p)
         }
 
         var param = JSON.stringify(param);

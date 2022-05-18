@@ -23,7 +23,11 @@ public class IndexController {
 
     @PostMapping("/doLogin")
     @ResponseBody
-    public Result<String> doLogin(@RequestBody User user) {
+    public Result<String> doLogin(@RequestBody User user) throws Exception {
+
+        user.setUsername(AESUtil.Decrypt(user.getUsername()));
+        user.setPassword(AESUtil.Decrypt(user.getPassword()));
+
         int id = userServiceImp.login(user);
         if (id == -1) {
             return Result.fail(RequestCode.FAIL.getCode(),"登录失败！");
@@ -35,12 +39,15 @@ public class IndexController {
 
     @PostMapping("/doRegister")
     @ResponseBody
-    public Result<String> doRegister(@RequestBody User user) {
+    public Result<String> doRegister(@RequestBody User user) throws Exception {
+        user.setUsername(AESUtil.Decrypt(user.getUsername()));
+        user.setPassword(AESUtil.Decrypt(user.getPassword()));
+
         int code = userServiceImp.register(user);
         if (code == 200) {
             return Result.success("注册成功");
         } else {
-            return Result.fail(RequestCode.FAIL.getCode(), "注册失败，账号已存在！");
+            return Result.fail(RequestCode.FAIL.getCode(), "注册失败，账号已存在");
         }
     }
 
@@ -51,7 +58,7 @@ public class IndexController {
         try {
             String token = request.getHeader("Authorization");
             redisUtils.del(token);
-            return Result.success("退出登录！");
+            return Result.success("退出登录");
         } catch (Exception e){
             e.printStackTrace();
             return Result.fail(RequestCode.FAIL.getCode(), "失败");
@@ -99,8 +106,10 @@ public class IndexController {
     @GetMapping("/test")
     @ResponseBody
     public String test(HttpServletRequest request) throws Exception {
-        String a =  AESUtil.Encrypt("123", "1234123412341234");
-        String b = AESUtil.Decrypt(a, "1234123412341234");
+        // {"username":"TNxJKgCmFKVQmyTCOaJCIw==","password":"sIaKap9w2qe0xO8jNC2MXQ=="}
+
+        String a =  AESUtil.Decrypt("TNxJKgCmFKVQmyTCOaJCIw==");
+        String b = AESUtil.Decrypt("sIaKap9w20xOqe8jNC2MXQ==");
 
         System.out.println(a);
         System.out.println(b);

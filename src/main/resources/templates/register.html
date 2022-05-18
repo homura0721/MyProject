@@ -103,6 +103,10 @@
 
 <script src="static/js/toastr.min.js"></script>
 
+<script src="static/js/aes.js"></script>
+
+<script src="static/js/crypto-js.js"></script>
+
 <script>
     toastr.options = {
         closeButton: false, // 是否显示关闭按钮，（提示框右上角关闭按钮）
@@ -120,12 +124,6 @@
         showMethod: "fadeIn", //   显示时的动画方式
         hideMethod: "fadeOut" //   消失时的动画方式
     };
-    window.onload = function () {
-        toastr.info('info');
-        toastr.success('success');
-        toastr.warning('warning');
-        toastr.error('error');
-    }
 
     function btnRegister() {
         var username = $("#username").val();
@@ -149,19 +147,18 @@
             return false;
         }
 
-        // register(username, password);
+        register(username, password);
     }
 
     function register(u, p) {
-        var username = u;
-        var password = p;
 
         var param = {
-            username: username,
-            password: password
+            username: encrypt_str(u),
+            password: encrypt_str(p)
         }
         var param = JSON.stringify(param);
-        console.log(param)
+
+        // console.log(param)
 
         $.ajax({
             url: "/doRegister",
@@ -171,6 +168,11 @@
             data: param,
             success: function (result) {
                 console.log(result);//打印服务端返回的数据(调试用)
+                if (result.code == 200) {
+                    toastr.success("注册成功");
+                } else {
+                    toastr.error(result.message);
+                }
             },
             error: function (result) {
                 console.log(result)
