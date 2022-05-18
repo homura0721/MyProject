@@ -18,6 +18,8 @@
     <!-- Custom CSS -->
     <link rel="stylesheet" href="static/css/style.css">
 
+    <link rel="stylesheet" href="static/css/toastr.min.css">
+
     <style>
         .VerifyCode-img {
             margin-top: 5px;
@@ -73,9 +75,8 @@
                             <i toggle="#password" class="fa fa-fw fa-eye toggle-password field-icon"></i>
                         </div>
 
-
                         <div class="form-group">
-                            <label for="VerifyCode" class="input-label">verCode</label>
+                            <label for="VerifyCode" class="input-label">VerifyCode</label>
                             <input id="VerifyCode" type="text" class="form-control" name="VerifyCode"
                                    required="required" maxlength="4">
                         </div>
@@ -88,7 +89,8 @@
                             <div class="fxt-checkbox-area">
                                 <div class="checkbox">
                                     <input id="checkbox1" type="checkbox">
-                                    <label for="checkbox1">Keep me logged in</label>
+                                    <!--                                    <label for="checkbox1">Keep me logged in</label>-->
+                                    <label for="checkbox1">Remember me</label>
                                 </div>
                                 <a href="forgot-password" class="switcher-text">Forgot Password</a>
                             </div>
@@ -98,7 +100,8 @@
                         </div>
                     </div>
                     <div class="fxt-style-line">
-                        <h3>Or Login With Email</h3>
+                        <!--                        <h3>Or Login With Email</h3>-->
+                        <h3>Or Login With</h3>
                     </div>
                     <ul class="fxt-socials">
                         <li class="fxt-facebook"><a href="#" title="Facebook">Twitter</a></li>
@@ -126,9 +129,30 @@
 <!-- Custom Js -->
 <script src="static/js/main.js"></script>
 
+<script src="static/js/toastr.min.js"></script>
+
+
 <script>
+    toastr.options = {
+        closeButton: false, // 是否显示关闭按钮，（提示框右上角关闭按钮）
+        debug: false, // 是否使用deBug模式
+        progressBar: true, // 是否显示进度条，（设置关闭的超时时间进度条）
+        positionClass: 'toast-center-right', // 设置提示款显示的位置
+        onclick: null, // 点击消息框自定义事件
+        showDuration: "1000", // 显示动画的时间
+        hideDuration: "1000", //  消失的动画时间
+        timeOut: "2000", //  自动关闭超时时间
+        extendedTimeOut: "1000", //  加长展示时间
+        showEasing: "swing", //  显示时的动画缓冲方式
+        hideEasing: "linear", //   消失时的动画缓冲方式
+        showMethod: "fadeIn", //   显示时的动画方式
+        hideMethod: "fadeOut" //   消失时的动画方式
+    };
+
     window.onload = function () {
         getVerify();
+        $("#username").val(localStorage.getItem("username"));
+        $("#password").val(localStorage.getItem("password"));
     }
 
     function btnLogin() {
@@ -137,15 +161,15 @@
         var verifyCode = $("#VerifyCode").val();
 
         if (username == ""){
-            alert("请输入用户名！");
+            toastr.warning("请输入用户名！");
             return false;
         }
         if (password == ""){
-            alert("请输入密码！");
+            toastr.warning("请输入密码！");
             return false;
         }
         if (verifyCode == "") {
-            alert("请输入验证码！");
+            toastr.warning("请输入验证码！");
             return false;
         }
         checkVerify();
@@ -172,7 +196,7 @@
                     login();
                 } else {
                     getVerify();
-                    alert("验证码错误！")
+                    toastr.error("验证码错误！")
                 }
             },
             error: function (result) {
@@ -182,9 +206,12 @@
     }
 
     function login() {
+        var u = $("#username").val();
+        var p = $("#password").val();
+
         var param = {
-            username: $("#username").val(),
-            password: $("#password").val()
+            username: u,
+            password: p
         }
 
         var param = JSON.stringify(param);
@@ -192,20 +219,28 @@
         $.ajax({
             url: "/doLogin",
             type: "POST",
-            contentType: "application/json", //！！要与后端接口对齐！！
+            contentType: "application/json", //！！与后端对齐！！
             dataType: "json",//预期服务器返回的数据类型
             data: param,
             success: function (result) {
                 console.log(result);//打印服务端返回的数据(调试用)
                 if (result.code == 200) {
                     localStorage.setItem("token", result.data);
+                    toastr.success(localStorage.getItem("token"))
+                    if ($("#checkbox1").get(0).checked) {
+                        localStorage.setItem("username", u)
+                        localStorage.setItem("password", p)
+                    } else {
+                        localStorage.setItem("username", "")
+                        localStorage.setItem("password", "")
+                    }
                 } else {
-                    alert(result.message)
+                    toastr.error(result.message)
                     getVerify();
                 }
             },
             error: function (result) {
-                console.log(result)
+                toastr.error(result)
             }
         });
     }

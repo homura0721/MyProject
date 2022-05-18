@@ -17,6 +17,8 @@
     <link href="static/css/css.css" rel="stylesheet">
     <!-- Custom CSS -->
     <link rel="stylesheet" href="static/css/style.css">
+
+    <link rel="stylesheet" href="static/css/toastr.min.css">
 </head>
 
 <body>
@@ -54,33 +56,31 @@
                     <div class="fxt-form">
                         <h2>Register</h2>
                         <p class="mb-5">Create an account</p>
-                        <form method="POST">
-                            <div class="form-group">
-                                <label for="name" class="input-label">Full Name</label>
-                                <input type="text" id="name" class="form-control" name="name" placeholder="name"
-                                       required="required">
-                            </div>
-                            <div class="form-group">
-                                <label for="email" class="input-label">Email Address</label>
-                                <input type="email" id="email" class="form-control" name="email"
-                                       placeholder="demo@gmail.com" required="required">
-                            </div>
-                            <div class="form-group">
-                                <label for="password" class="input-label">Password</label>
-                                <input id="password" type="password" class="form-control" name="password"
-                                       placeholder="********" required="required">
-                                <i toggle="#password" class="fa fa-fw fa-eye toggle-password field-icon"></i>
-                            </div>
-                            <div class="form-group">
-                                <label for="password" class="input-label">Confirm Password</label>
-                                <input id="re-password" type="password" class="form-control" name="password"
-                                       placeholder="********" required="required">
-                                <i toggle="#re-password" class="fa fa-fw fa-eye toggle-password field-icon"></i>
-                            </div>
-                            <div class="form-group">
-                                <button type="submit" class="fxt-btn-fill">Register</button>
-                            </div>
-                        </form>
+                        <div class="form-group">
+                            <label for="username" class="input-label">Username</label>
+                            <input type="text" id="username" class="form-control" name="username" placeholder="username"
+                                   required="required">
+                        </div>
+                        <!--                            <div class="form-group">-->
+                        <!--                                <label for="email" class="input-label">Email Address</label>-->
+                        <!--                                <input type="email" id="email" class="form-control" name="email"-->
+                        <!--                                       placeholder="demo@gmail.com" required="required">-->
+                        <!--                            </div>-->
+                        <div class="form-group">
+                            <label for="password" class="input-label">Password</label>
+                            <input id="password" type="password" class="form-control" name="password"
+                                   placeholder="********" required="required">
+                            <i toggle="#password" class="fa fa-fw fa-eye toggle-password field-icon"></i>
+                        </div>
+                        <div class="form-group">
+                            <label for="confirmPassword" class="input-label">Confirm Password</label>
+                            <input id="confirmPassword" type="password" class="form-control" name="confirmPassword"
+                                   placeholder="********" required="required">
+                            <i toggle="#re-password" class="fa fa-fw fa-eye toggle-password field-icon"></i>
+                        </div>
+                        <div class="form-group">
+                            <button type="submit" class="fxt-btn-fill" onclick="btnRegister()">Register</button>
+                        </div>
                     </div>
                     <div class="fxt-footer">
                         <p>Have an account?<a href="login" class="switcher-text2 inline-text">Log in</a></p>
@@ -100,6 +100,84 @@
 <script src="static/js/validator.min.js"></script>
 <!-- Custom Js -->
 <script src="static/js/main.js"></script>
+
+<script src="static/js/toastr.min.js"></script>
+
+<script>
+    toastr.options = {
+        closeButton: false, // 是否显示关闭按钮，（提示框右上角关闭按钮）
+        debug: false, // 是否使用deBug模式
+        progressBar: true, // 是否显示进度条，（设置关闭的超时时间进度条）
+        // positionClass: 'toast-center-center', // 设置提示款显示的位置
+        positionClass: 'toast-center-right', // 设置提示款显示的位置
+        onclick: null, // 点击消息框自定义事件
+        showDuration: "1000", // 显示动画的时间
+        hideDuration: "1000", //  消失的动画时间
+        timeOut: "2000", //  自动关闭超时时间
+        extendedTimeOut: "1000", //  加长展示时间
+        showEasing: "swing", //  显示时的动画缓冲方式
+        hideEasing: "linear", //   消失时的动画缓冲方式
+        showMethod: "fadeIn", //   显示时的动画方式
+        hideMethod: "fadeOut" //   消失时的动画方式
+    };
+    window.onload = function () {
+        toastr.info('info');
+        toastr.success('success');
+        toastr.warning('warning');
+        toastr.error('error');
+    }
+
+    function btnRegister() {
+        var username = $("#username").val();
+        var password = $("#password").val();
+        var confirmPassword = $("#confirmPassword").val();
+
+        if (username == "") {
+            toastr.warning("请输入用户名！");
+            return false;
+        }
+        if (password == "") {
+            toastr.warning("请输入密码！");
+            return false;
+        }
+        if (confirmPassword == "") {
+            toastr.warning("请重复输入密码！");
+            return false;
+        }
+        if (password != confirmPassword) {
+            toastr.warning("两次密码不相同！");
+            return false;
+        }
+
+        // register(username, password);
+    }
+
+    function register(u, p) {
+        var username = u;
+        var password = p;
+
+        var param = {
+            username: username,
+            password: password
+        }
+        var param = JSON.stringify(param);
+        console.log(param)
+
+        $.ajax({
+            url: "/doRegister",
+            type: "POST",
+            contentType: "application/json", //！！与后端对齐！！
+            dataType: "json",//预期服务器返回的数据类型
+            data: param,
+            success: function (result) {
+                console.log(result);//打印服务端返回的数据(调试用)
+            },
+            error: function (result) {
+                console.log(result)
+            }
+        });
+    }
+</script>
 
 </body>
 

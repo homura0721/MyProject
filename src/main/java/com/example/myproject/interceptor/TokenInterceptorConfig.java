@@ -8,11 +8,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
 public class TokenInterceptorConfig implements WebMvcConfigurer {
-    /**
-     * 默认访问的是首页
-     *
-     * @param registry
-     */
+
     @Override
     public void addViewControllers(ViewControllerRegistry registry) {
         registry.addViewController("/").setViewName("login");
@@ -40,6 +36,7 @@ public class TokenInterceptorConfig implements WebMvcConfigurer {
                 "/test",
                 "/doLogin",
                 "/doRegister",
+                "/doLogout",
                 "/getVerify/**",
                 "/checkVerify"
         };

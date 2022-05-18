@@ -3,8 +3,6 @@ package com.example.myproject.controller;
 import com.example.myproject.util.*;
 import com.example.myproject.model.User;
 import com.example.myproject.service.imp.UserServiceImp;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
@@ -14,6 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 @Controller
 public class IndexController {
@@ -22,19 +21,15 @@ public class IndexController {
     @Resource
     private RedisUtils redisUtils;
 
-    @GetMapping("/")
-    public ModelAndView login(){
-        return new ModelAndView("login");
-    }
-
     @PostMapping("/doLogin")
     @ResponseBody
     public Result<String> doLogin(@RequestBody User user) {
         int id = userServiceImp.login(user);
         if (id == -1) {
-            return Result.fail(RequestCode.FAIL.getCode(),"当前账号不存在！");
+            return Result.fail(RequestCode.FAIL.getCode(),"登录失败！");
         }
         String token = TokenUtil.sign(id + "");
+        redisUtils.set(token, id ,1 , TimeUnit.DAYS);
         return Result.success(token);
     }
 
@@ -66,7 +61,7 @@ public class IndexController {
     /**
      * 生成验证码
      */
-    @GetMapping(value = "/getVerify/{random}")
+    @GetMapping("/getVerify/{random}")
     public void getVerify(@PathVariable String random,  HttpServletRequest request,HttpServletResponse response) {
         try {
             response.setContentType("image/jpeg");//设置相应类型,告诉浏览器输出的内容为图片
@@ -103,11 +98,12 @@ public class IndexController {
 
     @GetMapping("/test")
     @ResponseBody
-    public String test(HttpServletRequest request) {
-        System.out.println("test接口");
-        String token = request.getHeader("Authorization");
-        System.out.println(TokenUtil.verify(token));
-        redisUtils.del("test");
+    public String test(HttpServletRequest request) throws Exception {
+        String a =  AESUtil.Encrypt("123", "1234123412341234");
+        String b = AESUtil.Decrypt(a, "1234123412341234");
+
+        System.out.println(a);
+        System.out.println(b);
         return "测试";
     }
 }

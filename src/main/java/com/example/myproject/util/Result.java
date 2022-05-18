@@ -40,10 +40,6 @@ public class Result<T> {
         return resultData;
     }
 
-
-
-
-
     public String getTime() {
         return time;
     }
