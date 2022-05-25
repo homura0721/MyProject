@@ -25,7 +25,7 @@ dependencies {
     implementation 'mysql:mysql-connector-java:8.0.28'
     implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:2.2.2'
     implementation 'com.baomidou:mybatis-plus-boot-starter:3.5.1'
-
+    //Redis
     implementation 'org.springframework.boot:spring-boot-starter-redis:1.4.7.RELEASE'
 }
 
