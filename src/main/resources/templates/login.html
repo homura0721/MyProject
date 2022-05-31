@@ -157,11 +157,11 @@
         getVerify();
         $("#username").val(localStorage.getItem("username"));
         $("#password").val(localStorage.getItem("password"));
-        console.log(localStorage.getItem("rememberMe"));
-        //todo false没法
-        $("#rememberMe").prop("checked", localStorage.getItem("rememberMe"));
-
-
+        /**
+         * localStorage取出来是String，
+         * String转boolean，字符串有值为true，无值为false
+         */
+        $("#rememberMe").prop('checked', Boolean(localStorage.getItem("rememberMe")));
     }
 
     function btnLogin() {
@@ -236,11 +236,11 @@
                     if ($("#rememberMe").prop("checked")) {
                         localStorage.setItem("username", u);
                         localStorage.setItem("password", p);
-                        localStorage.setItem("rememberMe", "true");
+                        localStorage.setItem("rememberMe", "1");
                     } else {
                         localStorage.setItem("username", "");
                         localStorage.setItem("password", "");
-                        localStorage.setItem("rememberMe", "false");
+                        localStorage.setItem("rememberMe", "");
                     }
                 } else {
                     toastr.error(result.message);
