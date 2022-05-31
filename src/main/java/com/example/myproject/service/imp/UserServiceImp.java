@@ -1,5 +1,6 @@
 package com.example.myproject.service.imp;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.example.myproject.dao.UserDao;
@@ -15,7 +16,6 @@ import java.util.concurrent.TimeUnit;
 
 @Service
 public class UserServiceImp extends ServiceImpl<UserDao, User> implements UserService {
-
     @Resource
     RedisUtils redisUtils;
 
@@ -30,15 +30,18 @@ public class UserServiceImp extends ServiceImpl<UserDao, User> implements UserSe
     public int login(User user) {
         User u = (User) redisUtils.get("user:" + user.getUsername());
         if (u != null && user.getPassword().equals(u.getPassword())) {
-            return u.getId();
+            return u.getUid();
         }
-        u = this.getOne(Wrappers.<User>lambdaQuery().eq(User::getUsername, user.getUsername()).eq(User::getPassword, user.getPassword()), false);
+        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("username", user.getUsername()).eq("password", user.getPassword());
+        u = this.getOne(queryWrapper, false);
         if (u != null) {
             redisUtils.set("user:" + u.getUsername(), u, 3, TimeUnit.DAYS);
-            return u.getId();
+            return u.getUid();
         } else {
             return -1;
         }
+
     }
 
     /**
@@ -54,7 +57,9 @@ public class UserServiceImp extends ServiceImpl<UserDao, User> implements UserSe
         if (u != null) {
             return -1;
         }
-        u = this.getOne(Wrappers.<User>lambdaQuery().eq(User::getUsername, user.getUsername()), false);
+        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("username", user.getUsername());
+        u = this.getOne(queryWrapper, false);
         if (u == null) {
             this.save(user);
             redisUtils.set("user:" + user.getUsername(), user, 3, TimeUnit.DAYS);
