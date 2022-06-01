@@ -30,7 +30,7 @@ public class TokenInterceptor implements HandlerInterceptor {
         }
         // 判断token
         if (!TokenUtil.verify(token)) {
-            falseResult(response, RequestCode.UNAUTHORIZED.getCode(), "token验证失败");
+            falseResult(response, RequestCode.UNAUTHORIZED.getCode(), "token验证失败，请重新登录");
             return false;
         }
         redisUtils.set("token:" + token, TokenUtil.getId(token), 1, TimeUnit.DAYS);
