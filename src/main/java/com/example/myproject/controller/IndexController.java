@@ -86,7 +86,7 @@ public class IndexController {
     @ResponseBody
     public boolean checkVerify(@RequestBody Map<String, Object> requestMap, HttpServletRequest request) {
         try {
-            //从session中获取随机数
+            //从redis中获取随机数
             String inputStr = requestMap.get("inputStr").toString();
 //            String random = (String) session.getAttribute("RANDOMVALIDATECODEKEY");
             String random = (String) redisUtils.get(CommonUtils.getCaptchaKey(request));

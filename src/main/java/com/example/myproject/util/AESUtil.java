@@ -29,14 +29,9 @@ public class AESUtil {
             Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
             cipher.init(Cipher.DECRYPT_MODE, skeySpec);
             byte[] encrypted1 = new Base64().decode(sSrc);//先用base64解密
-            try {
-                byte[] original = cipher.doFinal(encrypted1);
-                String originalString = new String(original, "utf-8");
-                return originalString;
-            } catch (Exception e) {
-                System.out.println(e.toString());
-                return null;
-            }
+            byte[] original = cipher.doFinal(encrypted1);
+            String originalString = new String(original, "utf-8");
+            return originalString;
         } catch (Exception ex) {
             System.out.println(ex.toString());
             return null;

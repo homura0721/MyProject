@@ -9,6 +9,7 @@ public class CommonUtils {
 
     /**
      * 获取ip
+     *
      * @param request
      * @return
      */
@@ -65,15 +66,16 @@ public class CommonUtils {
 
     /**
      * 获取缓存的key ,存放图片验证码
+     *
      * @param request
      * @return
      */
-    public static String getCaptchaKey(HttpServletRequest request){
+    public static String getCaptchaKey(HttpServletRequest request) {
         // 获取用户ip地址
         String ip = CommonUtils.getIpAddr(request);
         // 获取浏览器请求头
         String userAgent = request.getHeader("User-Agent");
-        String key = "user-service:captcha:"+ CommonUtils.MD5(ip+userAgent);
+        String key = "user-service:captcha:" + CommonUtils.MD5(ip + userAgent);
         return key;
     }
 }
